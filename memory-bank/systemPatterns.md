@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-The Attio Integration API uses a modular service-oriented architecture designed to act as a bridge between Attio CRM, Zoho, and Braintree. The system avoids maintaining its own database, instead leveraging Attio objects as the source of truth. A core feature is automating the entire subscription and payment lifecycle without manual intervention.
+The Attio Integration API uses a modular service-oriented architecture designed to act as a bridge between Attio CRM, Zoho, and Braintree. The system avoids maintaining its own database, instead leveraging Attio objects as the source of truth. A core feature is automating the entire subscription and payment lifecycle without manual intervention, using Braintree payment links instead of a custom checkout UI.
 
 ```mermaid
 graph TD
@@ -10,8 +10,9 @@ graph TD
     C[Zoho] <-->|Webhooks/API| B
     D[Braintree] <-->|Webhooks/API| B
     B -->|Update| A
-    E[Checkout UI] -->|Payment Data| B
-    A -->|Email Trigger| E
+    D -->|Payment Links| E[Customer Browser]
+    E -->|Complete Payment| D
+    A -->|Email with Link| E
 ```
 
 ## Core Design Patterns
@@ -22,8 +23,7 @@ The application is structured around service modules that encapsulate interactio
 
 - `zohoService.js` - Handles all Zoho API operations
 - `attioService.js` - Manages Attio API operations
-- `braintreeService.js` - Manages Braintree payment operations
-- `checkoutService.js` - Handles payment method collection UI
+- `braintreeService.js` - Manages Braintree payment operations and payment link generation
 
 These services abstract the complexity of integrating with each platform, providing a clean interface for the rest of the application.
 
@@ -53,11 +53,12 @@ The system operates on an event-driven model:
 - Each event type has a dedicated handler
 - State changes propagate through the system based on events
 
-### 5. Frontend-Backend Separation
+### 5. Third-Party Payment Flow
 
-- Checkout UI is a separate frontend component
-- API serves as the backend processing engine
-- Communication is via secure APIs
+- Braintree payment links handle the payment collection
+- No custom checkout UI to maintain
+- Secure payment processing through Braintree's hosted environment
+- Webhook-based notification when payment is complete
 
 ## Component Relationships
 
@@ -73,12 +74,7 @@ The system operates on an event-driven model:
 - Manages API authentication and communication
 - Transforms data between system formats
 - Handles automated customer and subscription creation
-
-### UI Layer
-
-- Provides Braintree checkout experience
-- Securely collects and tokenizes payment information
-- Communicates with API to create customers/subscriptions
+- Generates payment links via Braintree API
 
 ### Utility Layer
 
@@ -111,13 +107,13 @@ Using Render.com for serverless deployment:
 - **Cons**: Cold start latency, execution time limits
 - **Mitigation**: Optimize code for quick startup, implement background processes for long-running tasks
 
-### 4. Custom Checkout UI
+### 4. Braintree Payment Links
 
-Building a custom Braintree checkout UI:
+Using Braintree payment links instead of a custom checkout UI:
 
-- **Pros**: Full control over user experience, seamless integration with our workflow
-- **Cons**: Development and maintenance overhead, security considerations
-- **Mitigation**: Use Braintree Hosted Fields for PCI compliance, extensive testing
+- **Pros**: No UI development or maintenance needed, PCI compliance handled by Braintree, seamless user experience
+- **Cons**: Less customization of the payment experience, dependency on Braintree's link functionality
+- **Mitigation**: Clear communication about payment process in email templates, fallback methods if needed
 
 ## Automation Workflows
 
@@ -125,18 +121,21 @@ Building a custom Braintree checkout UI:
 
 ```mermaid
 sequenceDiagram
+    participant Customer
     participant Attio
     participant API
-    participant Checkout
     participant Braintree
     participant Zoho
 
-    Attio->>API: Trigger subscription email
-    API->>Attio: Update with checkout link
-    Checkout->>Braintree: Tokenize payment method
-    Braintree-->>Checkout: Payment token
-    Checkout->>API: Submit customer + payment info
-    API->>Braintree: Create customer
+    Customer->>Attio: Select subscription
+    Attio->>API: Trigger subscription process
+    API->>Braintree: Generate payment link
+    Braintree-->>API: Payment link URL
+    API->>Attio: Return payment link
+    Attio->>Customer: Email payment link
+    Customer->>Braintree: Complete payment on Braintree page
+    Braintree->>API: Payment webhook
+    API->>Braintree: Create customer record
     Braintree-->>API: Braintree Customer ID
     API->>Zoho: Create customer + subscription
     Zoho-->>API: Zoho Customer ID

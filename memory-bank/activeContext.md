@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-We are in the initial project setup phase of the Attio Integration API, focusing on defining the project architecture and establishing the core integration patterns for connecting Attio CRM, Zoho, and Braintree. Based on new input, we are refining the workflow to eliminate manual processes in the subscription and payment flow.
+We are in the initial project setup phase of the Attio Integration API, focusing on defining the project architecture and establishing the core integration patterns for connecting Attio CRM, Zoho, and Braintree. Based on new input, we are refining the workflow to eliminate manual processes in the subscription and payment flow using Braintree payment links instead of a custom checkout UI.
 
 ## Recent Changes
 
@@ -13,7 +13,7 @@ We are in the initial project setup phase of the Attio Integration API, focusing
 - Updated project documentation to use pnpm instead of npm
 - Cleaned up .cursor/rules file to remove irrelevant content
 - Refined the workflow based on feedback about Zoho Flow limitations
-- Added requirements for a Braintree checkout UI component
+- Shifted from custom checkout UI to Braintree payment links approach
 
 ## Active Decisions
 
@@ -47,11 +47,11 @@ We are in the initial project setup phase of the Attio Integration API, focusing
    - Status: Confirmed
    - Rationale: Faster installation, better dependency management, and disk space efficiency
 
-6. **Checkout Flow**:
+6. **Payment Flow**:
 
-   - Decision: Build a custom Braintree checkout UI
+   - Decision: Use Braintree payment links instead of custom checkout UI
    - Status: Confirmed
-   - Rationale: Required to capture payment methods and automate customer creation
+   - Rationale: Simplifies development, eliminates UI maintenance, leverages Braintree's secure checkout
 
 7. **Automated Workflow**:
    - Decision: Replace manual processes with API-driven workflow
@@ -64,31 +64,31 @@ We are in the initial project setup phase of the Attio Integration API, focusing
 2. **Webhook Security**: Implementing proper signature verification for all incoming webhooks
 3. **Zoho API Authentication**: Setting up OAuth flow with refresh token management
 4. **Testing Strategy**: Creating a test environment that simulates the three-platform interaction
-5. **Checkout UI Development**: Building a hosted Braintree checkout that integrates with our API flow
+5. **Braintree Integration**: Learning and implementing Braintree payment links functionality
 
 ## Refined Workflow
 
-Based on new information about Zoho Flow limitations, our workflow will now:
+Based on new information about Zoho Flow limitations and UI preferences, our workflow will now:
 
 1. **Customer Subscription Initiation**:
 
-   - Use Attio workflows to trigger an email to client with checkout link
-   - Customer completes payment via our Braintree hosted checkout UI
-   - API automatically creates Braintree customer and updates Attio
+   - Customer selects subscription in Attio
+   - Attio automation triggers our API
+   - API generates Braintree payment link
+   - API provides link back to Attio
+   - Attio sends email with payment link to customer
+   - Customer completes payment on Braintree-hosted page
+   - Braintree webhook notifies our API
+   - API creates Zoho subscription and updates Attio
 
-2. **Zoho Integration**:
-
-   - API automatically creates a customer/subscription in Zoho Subscriptions
-   - API updates the Zoho Subscriptions Customer ID in Attio
-
-3. **Invoice & Payment Handling**:
+2. **Invoice & Payment Handling**:
    - When Zoho generates an invoice, it sends a webhook to our API
    - API finds the client in Attio using the Zoho Subscription Customer ID
    - API retrieves the Braintree Customer ID from Attio
    - API creates a sale in Braintree using stored payment information
    - API notifies Zoho Subscriptions of the payment
 
-This fully automated flow eliminates the manual steps in the original plan.
+This fully automated flow eliminates the manual steps in the original plan while avoiding the need to build a custom UI.
 
 ## Next Steps
 
@@ -105,7 +105,7 @@ This fully automated flow eliminates the manual steps in the original plan.
 1. Implement Attio API client for object creation/updates
 2. Set up Zoho OAuth authentication flow
 3. Configure Braintree sandbox environment
-4. Start developing the Braintree checkout UI component
+4. Research and implement Braintree payment links generation
 5. Implement customer creation flows (Attio → Braintree → Zoho)
 
 ### Medium-term (Next 2 Weeks)
@@ -122,13 +122,13 @@ This fully automated flow eliminates the manual steps in the original plan.
 - What is the expected volume of subscriptions/transactions?
 - Are there any existing Zoho webhooks already configured?
 - What level of reporting is required for subscription status?
-- What should the checkout UI look like and what information should be collected?
+- Does Braintree provide payment links functionality in our region/account?
 
 ## Resource Links
 
 - [Attio API Documentation](https://developers.attio.com/)
 - [Zoho Subscriptions API](https://www.zoho.com/subscriptions/api/v1/)
 - [Braintree Node SDK](https://github.com/braintree/braintree_node)
-- [Braintree Hosted Fields](https://developers.braintreepayments.com/guides/hosted-fields/overview/javascript/v3)
+- [Braintree Payment Links](https://developer.paypal.com/braintree/docs/guides/payment-links/overview)
 - [Render.com Documentation](https://render.com/docs)
 - [pnpm Documentation](https://pnpm.io/)

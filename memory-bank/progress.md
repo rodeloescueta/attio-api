@@ -11,7 +11,7 @@
 - Project planning and requirements documentation complete
 - Technology selection and architecture decisions made
 - Documentation structure established
-- Refined workflow to eliminate manual processes
+- Refined workflow to eliminate manual processes using Braintree payment links
 - Repository setup on GitHub
 
 ## What's In Progress
@@ -19,7 +19,7 @@
 - Setting up basic project structure
 - Researching API endpoints for all three platforms
 - Planning Attio data model for client objects and customer IDs
-- Defining checkout UI requirements
+- Researching Braintree payment links implementation
 
 ## What's Left To Build
 
@@ -31,13 +31,13 @@
 - [ ] Deployment configuration for Render.com
 - [ ] Error handling and logging framework
 
-### Checkout UI (0% Complete)
+### Braintree Payment Links (0% Complete)
 
-- [ ] Braintree hosted fields implementation
-- [ ] Customer information collection form
-- [ ] Payment method tokenization
+- [ ] Payment link generation implementation
+- [ ] Webhook handling for payment notifications
+- [ ] Customer creation after payment
 - [ ] Secure communication with API
-- [ ] Success/error handling
+- [ ] Payment status tracking
 
 ### Attio Integration (0% Complete)
 
@@ -45,7 +45,7 @@
 - [ ] Client object schema definition with Zoho and Braintree IDs
 - [ ] Object CRUD operations
 - [ ] Email trigger workflow
-- [ ] Checkout link generation
+- [ ] Payment link distribution in emails
 
 ### Zoho Integration (0% Complete)
 
@@ -58,7 +58,7 @@
 ### Braintree Integration (0% Complete)
 
 - [ ] SDK initialization
-- [ ] Payment method tokenization
+- [ ] Payment links API usage
 - [ ] Customer creation flow
 - [ ] Subscription management
 - [ ] Payment processing for invoices
@@ -81,7 +81,7 @@
 - [ ] API documentation
 - [ ] Webhook payload examples
 - [ ] Deployment instructions
-- [ ] Checkout UI integration guide
+- [ ] Payment links integration guide
 
 ## Known Issues
 
@@ -89,24 +89,24 @@
 
 ## Milestones
 
-| Milestone               | Target Date | Status |
-| ----------------------- | ----------- | ------ |
-| Project Planning        | Complete    | ✅     |
-| Workflow Refinement     | Complete    | ✅     |
-| Basic API Setup         | Not Started | ⬜     |
-| Checkout UI Development | Not Started | ⬜     |
-| Attio Integration       | Not Started | ⬜     |
-| Zoho Integration        | Not Started | ⬜     |
-| Braintree Integration   | Not Started | ⬜     |
-| Testing & Validation    | Not Started | ⬜     |
-| Production Deployment   | Not Started | ⬜     |
+| Milestone                 | Target Date | Status |
+| ------------------------- | ----------- | ------ |
+| Project Planning          | Complete    | ✅     |
+| Workflow Refinement       | Complete    | ✅     |
+| Basic API Setup           | Not Started | ⬜     |
+| Payment Links Integration | Not Started | ⬜     |
+| Attio Integration         | Not Started | ⬜     |
+| Zoho Integration          | Not Started | ⬜     |
+| Braintree Integration     | Not Started | ⬜     |
+| Testing & Validation      | Not Started | ⬜     |
+| Production Deployment     | Not Started | ⬜     |
 
 ## Recent Achievements
 
 - Completed initial project planning
 - Established documentation structure
 - Defined core architecture and integration patterns
-- Refined workflow to eliminate manual processes
+- Refined workflow to eliminate manual processes using payment links
 - Created GitHub repository
 
 ## Blockers
@@ -114,6 +114,6 @@
 - Waiting on Attio API access
 - Need confirmation on specific Zoho subscription plan details
 - Awaiting Braintree sandbox account setup
-- Need to finalize checkout UI requirements
+- Need to verify Braintree payment links functionality in our account
 
 This document will be updated as the project progresses to reflect the current state of development.
