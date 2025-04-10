@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-We are in the initial project setup phase of the Attio Integration API, focusing on defining the project architecture and establishing the core integration patterns for connecting Attio CRM, Zoho, and Braintree. Based on new input, we are refining the workflow to eliminate manual processes in the subscription and payment flow using Braintree payment links instead of a custom checkout UI.
+We are in the initial implementation phase of the Attio Integration API, focusing on building out the core infrastructure components. We've established the basic Express API structure and are implementing the service layers using a functional programming approach. We've recently implemented authentication middleware using API key validation and a permission-based access control system. The focus is on creating a robust and secure foundation for the three-way integration between Attio CRM, Zoho, and Braintree.
 
 ## Recent Changes
 
@@ -14,6 +14,15 @@ We are in the initial project setup phase of the Attio Integration API, focusing
 - Cleaned up .cursor/rules file to remove irrelevant content
 - Refined the workflow based on feedback about Zoho Flow limitations
 - Shifted from custom checkout UI to Braintree payment links approach
+- Set up basic Express.js server with routes and logging
+- Implemented functional approach for Attio service layer
+- Created configuration management system
+- Added webhook validation middleware skeleton
+- Removed unnecessary helper.env file
+- Implemented authentication middleware with API key validation
+- Added permission-based access control for routes
+- Created utility scripts for token generation and testing
+- Updated environment configuration with API access token
 
 ## Active Decisions
 
@@ -54,9 +63,27 @@ We are in the initial project setup phase of the Attio Integration API, focusing
    - Rationale: Simplifies development, eliminates UI maintenance, leverages Braintree's secure checkout
 
 7. **Automated Workflow**:
+
    - Decision: Replace manual processes with API-driven workflow
    - Status: Confirmed
    - Rationale: Remove human intervention in the subscription/payment flow
+
+8. **Code Structure**:
+
+   - Decision: Use functional programming approach instead of classes
+   - Status: Confirmed
+   - Rationale: Better composability, easier testing, and follows modern JavaScript patterns
+
+9. **API Authentication**:
+
+   - Decision: Use API key authentication with Bearer token
+   - Status: Confirmed
+   - Rationale: Simple to implement, secure, and allows for future extension to more sophisticated auth methods
+
+10. **Permission Model**:
+    - Decision: Implement a permission-based middleware framework
+    - Status: Confirmed
+    - Rationale: Provides granular control over route access and can be extended to support different user roles in the future
 
 ## Current Challenges
 
@@ -94,11 +121,12 @@ This fully automated flow eliminates the manual steps in the original plan while
 
 ### Immediate (Next 1-2 Days)
 
-1. Set up basic Express API project structure with pnpm
-2. Create service files for each integration (zohoService.js, attioService.js, braintreeService.js)
-3. Implement basic webhook endpoints for each platform
-4. Configure environment variables in development environment
-5. Define the data model requirements for Attio Clients object
+1. ~~Set up basic Express API project structure with pnpm~~ ✅
+2. ~~Create service files for each integration (attioService.js)~~ ✅
+3. ~~Set up authentication middleware for protected routes~~ ✅
+4. Create service files for each integration (zohoService.js, braintreeService.js)
+5. Implement Attio webhook signature verification
+6. Configure environment variables for development and testing
 
 ### Short-term (This Week)
 
