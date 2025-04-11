@@ -28,6 +28,14 @@ const config = {
     refreshToken: process.env.ZOHO_REFRESH_TOKEN,
     organizationId: process.env.ZOHO_ORGANIZATION_ID,
     webhookSecret: process.env.ZOHO_WEBHOOK_SECRET,
+    // Legacy API URL (will be deprecated according to Zoho warning)
+    baseUrl:
+      process.env.ZOHO_API_URL || "https://subscriptions.zoho.com/api/v1",
+    // New API domain settings
+    domainUrl: process.env.ZOHO_DOMAIN_URL || "www.zohoapis.com/billing",
+    // Using the new domain by default since the old domain will be deprecated next month
+    // Override with USE_LEGACY_ZOHO_DOMAIN=true to use the old domain during transition
+    useNewApiDomain: process.env.USE_LEGACY_ZOHO_DOMAIN !== "true",
   },
 
   // Braintree configuration
@@ -46,6 +54,12 @@ const validateConfig = () => {
 
   if (!config.attio.apiKey) missingVars.push("ATTIO_API_KEY");
   if (!config.api.accessToken) missingVars.push("API_ACCESS_TOKEN");
+
+  // Zoho variables needed for service synchronization
+  if (!config.zoho.clientId) missingVars.push("ZOHO_CLIENT_ID");
+  if (!config.zoho.clientSecret) missingVars.push("ZOHO_CLIENT_SECRET");
+  if (!config.zoho.refreshToken) missingVars.push("ZOHO_REFRESH_TOKEN");
+  if (!config.zoho.organizationId) missingVars.push("ZOHO_ORGANIZATION_ID");
 
   if (missingVars.length > 0) {
     console.error(

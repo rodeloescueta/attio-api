@@ -116,6 +116,172 @@ const updateObject = async (id, updateData) => {
 };
 
 /**
+ * Get all collections in the workspace
+ * @returns {Promise<Array>} - Array of collection objects
+ */
+const getCollections = async () => {
+  try {
+    const response = await apiClient.get("/workspace/collections");
+    logger.info(`Retrieved ${response.data.data.length} collections`);
+    return response.data.data;
+  } catch (error) {
+    handleApiError(error, "Failed to get collections");
+    throw error;
+  }
+};
+
+/**
+ * Get a specific collection by API ID
+ * @param {string} apiId - The collection's API ID
+ * @returns {Promise<Object|null>} - The collection data or null if not found
+ */
+const getCollection = async (apiId) => {
+  try {
+    const response = await apiClient.get(`/workspace/collections/${apiId}`);
+    logger.info(`Retrieved collection: ${apiId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `Failed to get collection: ${apiId}`);
+    return null;
+  }
+};
+
+/**
+ * Create a new collection in Attio
+ * @param {Object} collectionData - The collection data to create
+ * @returns {Promise<Object>} - The created collection data
+ */
+const createCollection = async (collectionData) => {
+  try {
+    const response = await apiClient.post(
+      "/workspace/collections",
+      collectionData
+    );
+    logger.info(`Collection created successfully: ${response.data.api_id}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, "Failed to create collection");
+    throw error;
+  }
+};
+
+/**
+ * Update an existing collection in Attio
+ * @param {string} apiId - The collection's API ID
+ * @param {Object} updateData - The data to update
+ * @returns {Promise<Object>} - The updated collection data
+ */
+const updateCollection = async (apiId, updateData) => {
+  try {
+    const response = await apiClient.patch(
+      `/workspace/collections/${apiId}`,
+      updateData
+    );
+    logger.info(`Collection updated successfully: ${apiId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, `Failed to update collection: ${apiId}`);
+    throw error;
+  }
+};
+
+/**
+ * Create a new attribute in a collection
+ * @param {string} collectionApiId - The collection's API ID
+ * @param {Object} attributeData - The attribute data
+ * @returns {Promise<Object>} - The created attribute
+ */
+const createAttribute = async (collectionApiId, attributeData) => {
+  try {
+    const response = await apiClient.post(
+      `/workspace/collections/${collectionApiId}/attributes`,
+      attributeData
+    );
+    logger.info(`Attribute created successfully: ${response.data.api_id}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error, "Failed to create attribute");
+    throw error;
+  }
+};
+
+/**
+ * Get objects from a collection
+ * @param {string} collectionApiId - The collection's API ID
+ * @param {Object} [queryParams] - Optional query parameters
+ * @returns {Promise<Array>} - Array of objects
+ */
+const getObjectsFromCollection = async (collectionApiId, queryParams = {}) => {
+  try {
+    const response = await apiClient.get(
+      `/collections/${collectionApiId}/entries`,
+      { params: queryParams }
+    );
+    logger.info(
+      `Retrieved ${response.data.data.length} objects from collection ${collectionApiId}`
+    );
+    return response.data.data;
+  } catch (error) {
+    handleApiError(
+      error,
+      `Failed to get objects from collection: ${collectionApiId}`
+    );
+    throw error;
+  }
+};
+
+/**
+ * Create an object in a collection
+ * @param {string} collectionApiId - The collection's API ID
+ * @param {Object} objectData - The object data
+ * @returns {Promise<Object>} - The created object
+ */
+const createObjectInCollection = async (collectionApiId, objectData) => {
+  try {
+    const response = await apiClient.post(
+      `/collections/${collectionApiId}/entries`,
+      objectData
+    );
+    logger.info(`Object created in collection ${collectionApiId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(
+      error,
+      `Failed to create object in collection: ${collectionApiId}`
+    );
+    throw error;
+  }
+};
+
+/**
+ * Update an object in a collection
+ * @param {string} collectionApiId - The collection's API ID
+ * @param {string} objectId - The object ID
+ * @param {Object} updateData - The data to update
+ * @returns {Promise<Object>} - The updated object
+ */
+const updateObjectInCollection = async (
+  collectionApiId,
+  objectId,
+  updateData
+) => {
+  try {
+    const response = await apiClient.patch(
+      `/collections/${collectionApiId}/entries/${objectId}`,
+      updateData
+    );
+    logger.info(`Object updated in collection ${collectionApiId}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(
+      error,
+      `Failed to update object in collection: ${collectionApiId}`
+    );
+    throw error;
+  }
+};
+
+/**
  * Process a webhook event for object creation
  * @param {Object} data - The webhook payload data
  */
@@ -150,6 +316,14 @@ module.exports = {
   getObject,
   createObject,
   updateObject,
+  getCollections,
+  getCollection,
+  createCollection,
+  updateCollection,
+  createAttribute,
+  getObjectsFromCollection,
+  createObjectInCollection,
+  updateObjectInCollection,
   processObjectCreated,
   processObjectUpdated,
   processObjectDeleted,

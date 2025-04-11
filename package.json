@@ -8,7 +8,10 @@
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-token": "node scripts/generate-token.js",
-    "test-auth": "node scripts/test-auth.js"
+    "test-auth": "node scripts/test-auth.js",
+    "test-sync": "node scripts/test-sync.js",
+    "test-zoho": "node scripts/test-zoho-plans.js",
+    "inspect-plan": "node scripts/inspect-zoho-plan.js"
   },
   "dependencies": {
     "axios": "^1.8.4",

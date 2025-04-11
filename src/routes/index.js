@@ -3,6 +3,7 @@ const logger = require("../utils/logger");
 
 // Import route modules
 const attioRoutes = require("./attio.routes");
+const syncRoutes = require("./sync.routes");
 
 /**
  * Sets up all API routes
@@ -16,6 +17,7 @@ function setupRoutes(app) {
 
   // Register route modules
   app.use(`${apiPrefix}/attio`, attioRoutes);
+  app.use(`${apiPrefix}/sync`, syncRoutes);
 
   // Health check endpoint
   app.get("/health", (req, res) => {

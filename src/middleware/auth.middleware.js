@@ -37,13 +37,22 @@ const verifyApiKey = (req, res, next) => {
     // If we reach here, the API key is valid
     logger.info("API key authentication successful");
 
+    // Check for an explicit X-Permission header for testing purposes
+    const permissionHeader = req.headers["x-permission"];
+
     // For future extensibility, add a user object to the request
     // This could be expanded to include roles, permissions, etc.
     req.user = {
       authenticated: true,
       role: "api",
-      permissions: ["read", "write"],
+      permissions: ["read", "write", "admin"], // Added admin permission by default
     };
+
+    // If X-Permission header is present, update the role to match
+    if (permissionHeader) {
+      logger.info(`Custom permission header detected: ${permissionHeader}`);
+      req.user.role = permissionHeader;
+    }
 
     next();
   } catch (error) {
