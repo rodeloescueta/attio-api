@@ -18,20 +18,28 @@ const validateAttioPayload = (req, res, next) => {
   }
 
   try {
-    const signature = req.headers["x-attio-signature"];
+    // Get signature from header (Attio sends both Attio-Signature and X-Attio-Signature)
+    const signature =
+      req.headers["attio-signature"] || req.headers["x-attio-signature"];
 
     if (!signature) {
       logger.error("Missing Attio webhook signature");
       return res.status(401).json({ message: "Missing signature" });
     }
 
-    // Verify the signature (implementation will depend on Attio's signature method)
-    // This is a placeholder implementation - refer to Attio documentation for actual method
+    // Verify the signature using SHA-256 HMAC
     const payload = JSON.stringify(req.body);
     const hmac = crypto.createHmac("sha256", config.attio.webhookSecret);
-    const digest = hmac.update(payload).digest("hex");
+    hmac.update(payload);
+    const expectedSignature = hmac.digest("hex");
 
-    if (signature !== digest) {
+    // Use timing-safe comparison to prevent timing attacks
+    if (
+      !crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+      )
+    ) {
       logger.error("Invalid Attio webhook signature");
       return res.status(401).json({ message: "Invalid signature" });
     }
