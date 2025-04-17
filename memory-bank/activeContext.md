@@ -4,6 +4,8 @@
 
 We have successfully implemented the core Attio-Zoho integration for service synchronization, and completed a full sync of all production plans from Zoho to Attio. The system can now retrieve service plans from Zoho Subscriptions, create a corresponding collection in Attio, and populate it with service data. We're now focusing on automating this synchronization process, improving error handling, and preparing for the next phase of the subscription workflow implementation.
 
+We are also adding a frontend component using EJS templates to create client-facing views for proposals and quotes. This will allow clients to view service proposals with pricing information pulled from Attio. The frontend will also include a markdown-to-HTML conversion utility for rendering service agreements and other formatted content.
+
 ## Recent Changes
 
 - Created project plan (PLAN.md)
@@ -32,6 +34,7 @@ We have successfully implemented the core Attio-Zoho integration for service syn
 - Fixed data type issues in the billing_frequency field for Attio integration
 - Successfully completed a full synchronization of all Zoho production plans to Attio
 - Created comprehensive documentation for the Zoho-Attio synchronization process
+- Updated project plan to include client-facing frontend using EJS templates
 
 ## Active Decisions
 
@@ -108,9 +111,15 @@ We have successfully implemented the core Attio-Zoho integration for service syn
     - Rationale: Follows Zoho's recommended approach and handles token expiration automatically
 
 13. **Data Synchronization Format**:
+
     - Decision: Convert Zoho numeric values to strings for Attio compatibility when needed
     - Status: Implemented
     - Rationale: Ensures data type consistency between the two systems
+
+14. **Frontend Technology**:
+    - Decision: Use EJS templates with Express.js for client-facing views
+    - Status: Confirmed
+    - Rationale: Simplifies integration with existing Express app, lightweight, and sufficient for our needs
 
 ## Current Challenges
 
@@ -119,6 +128,8 @@ We have successfully implemented the core Attio-Zoho integration for service syn
 3. **Detecting Changes**: Implementing a mechanism to detect and sync only changed plans
 4. **Webhook Security**: Implementing proper signature verification for all incoming webhooks
 5. **Subscription Creation Flow**: Planning the implementation of the subscription creation process
+6. **Client-Facing Views**: Creating secure, unique URLs for clients to view proposals and quotes
+7. **Markdown Processing**: Converting markdown content from Attio to properly formatted HTML
 
 ## Implementation Progress
 
@@ -146,11 +157,19 @@ Next is the implementation of the subscription flow:
    - API creates Zoho subscription and updates Attio
 
 3. **Invoice & Payment Handling**:
+
    - When Zoho generates an invoice, it sends a webhook to our API
    - API finds the client in Attio using the Zoho Subscription Customer ID
    - API retrieves the Braintree Customer ID from Attio
    - API creates a sale in Braintree using stored payment information
    - API notifies Zoho Subscriptions of the payment
+
+4. **Client-Facing Frontend**:
+   - Generate unique URLs for client proposals and quotes
+   - Display service information from Attio
+   - Show pricing details in a clean, professional format
+   - Present service agreements with proper formatting
+   - Provide a way for clients to accept proposals (potentially)
 
 ## Next Steps
 
@@ -168,6 +187,9 @@ Next is the implementation of the subscription flow:
 10. ~~Complete full synchronization of all Zoho plans to Attio~~ ✅
 11. Implement detailed error handling and logging
 12. Set up automatic periodic synchronization using a cron job
+13. Install and configure EJS template engine
+14. Create basic layout templates for proposals and quotes
+15. Implement markdown-to-HTML conversion utility
 
 ### Short-term (This Week)
 
@@ -175,6 +197,10 @@ Next is the implementation of the subscription flow:
 2. Start implementing the Braintree service for payment links
 3. Begin development of the subscription creation flow
 4. Create client object schema in Attio with necessary IDs
+5. Create routes for proposal and quote views
+6. Implement secure URL generation for client access
+7. Design and implement proposal view template
+8. Fetch and display service data from Attio in templates
 
 ### Medium-term (Next 2 Weeks)
 
@@ -183,6 +209,11 @@ Next is the implementation of the subscription flow:
 3. Implement automated payment processing via webhooks
 4. Create comprehensive testing scenarios
 5. Deploy test version to Render.com
+6. Add quote view template with dynamic pricing
+7. Implement service agreement display with markdown parsing
+8. Create URL tracking and expiration system
+9. Add proposal acceptance functionality (if required)
+10. Implement print and PDF export options
 
 ## Current Questions
 
@@ -190,6 +221,10 @@ Next is the implementation of the subscription flow:
 - What specific fields are needed in the Attio Clients object beyond the identified Customer IDs?
 - What is the expected volume of subscriptions/transactions?
 - Are there any existing Zoho webhooks already configured?
+- What specific information needs to be displayed in the proposal view?
+- Will clients need to take any actions directly on the proposal page?
+- What is the desired URL format for client-facing views?
+- How should service agreements be formatted in the frontend?
 
 ## Resource Links
 
@@ -199,3 +234,5 @@ Next is the implementation of the subscription flow:
 - [Braintree Payment Links](https://developer.paypal.com/braintree/docs/guides/payment-links/overview)
 - [Render.com Documentation](https://render.com/docs)
 - [pnpm Documentation](https://pnpm.io/)
+- [EJS Documentation](https://ejs.co/)
+- [Marked.js for Markdown Parsing](https://marked.js.org/)

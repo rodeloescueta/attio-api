@@ -17,13 +17,21 @@
     "axios": "^1.8.4",
     "body-parser": "^1.20.2",
     "braintree": "^3.22.0",
+    "compression": "^1.8.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "helmet": "^7.1.0",
+    "marked": "^15.0.8",
+    "sanitize-html": "^2.16.0",
     "winston": "^3.12.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.1"
+    "autoprefixer": "^10.4.21",
+    "nodemon": "^3.1.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4"
   },
   "engines": {
     "node": ">=14.0.0"

@@ -3,7 +3,7 @@
 ## Overall Status
 
 **Current Phase**: Initial Implementation
-**Completion**: ~48%
+**Completion**: ~45%
 **Project Health**: 🟢 On Track
 
 ## What Works
@@ -32,6 +32,7 @@
 - Enhancing error handling and adding retry logic
 - Planning Braintree payment links integration
 - Implementing plan processing workflow
+- Planning client-facing frontend with EJS templates
 
 ## What's Left To Build
 
@@ -83,6 +84,20 @@
 - [ ] Webhook handling for payment events
 - [ ] Sandbox testing environment
 
+### Frontend Implementation (0% Complete)
+
+- [ ] EJS template engine setup
+- [ ] Basic layout and styling
+- [ ] Proposal view template
+- [ ] Quote view template
+- [ ] Markdown to HTML conversion utility
+- [ ] Secure URL generation
+- [ ] Service data display from Attio
+- [ ] Service agreement display with formatting
+- [ ] URL tracking and expiration
+- [ ] Proposal acceptance functionality
+- [ ] Print and PDF export options
+
 ### Testing (30% Complete)
 
 - [x] Authentication and permission testing
@@ -93,6 +108,8 @@
 - [ ] End-to-end flow testing
 - [ ] Error handling verification
 - [ ] Payment flow testing
+- [ ] Frontend view testing
+- [ ] URL security testing
 
 ### Documentation (50% Complete)
 
@@ -106,6 +123,7 @@
 - [ ] Webhook payload examples
 - [ ] Deployment instructions
 - [ ] Payment links integration guide
+- [ ] Frontend implementation guide
 
 ## Known Issues
 
@@ -123,6 +141,7 @@
 | Complete Attio Integration | In Progress | 🔄     |
 | Zoho Integration           | In Progress | 🔄     |
 | Braintree Integration      | Not Started | ⬜     |
+| Frontend Implementation    | Not Started | ⬜     |
 | Testing & Validation       | In Progress | 🔄     |
 | Production Deployment      | Not Started | ⬜     |
 
@@ -148,10 +167,11 @@
 - Successfully synchronized all 85 production plans from Zoho to Attio
 - Created comprehensive documentation for Zoho-Attio integration
 - Added /process-plan endpoint with Bearer token authentication and detailed request logging
+- Updated project plan to include client-facing frontend with EJS templates
 
 ## Current Focus
 
-The current focus is on implementing the plan processing workflow and preparing for Braintree integration:
+The current focus is on implementing the plan processing workflow, preparing for Braintree integration, and planning the client-facing frontend:
 
 1. Testing and refining the /process-plan endpoint
 2. Documenting the plan processing workflow
@@ -161,11 +181,14 @@ The current focus is on implementing the plan processing workflow and preparing 
 6. Implementing incremental synchronization to improve efficiency
 7. Starting work on the Braintree payment links integration
 8. Creating the subscription creation flow
+9. Planning the EJS frontend implementation
+10. Preparing for proposal and quote view templates
 
 ## Blockers
 
 - Need confirmation on the preferred frequency for Zoho-Attio synchronization
 - Awaiting Braintree sandbox account setup
 - Need to verify Braintree payment links functionality in our account
+- Need detailed requirements for the client-facing proposal and quote views
 
 This document will be updated as the project progresses to reflect the current state of development.

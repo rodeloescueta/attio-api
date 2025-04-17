@@ -1,171 +1,515 @@
 # System Patterns
 
-## Architecture Overview
+This document outlines the key architectural patterns, coding conventions, and system design decisions for the Attio Integration API.
 
-The Attio Integration API uses a modular service-oriented architecture designed to act as a bridge between Attio CRM, Zoho, and Braintree. The system avoids maintaining its own database, instead leveraging Attio objects as the source of truth. A core feature is automating the entire subscription and payment lifecycle without manual intervention, using Braintree payment links instead of a custom checkout UI.
+## 1. Service Architecture
 
-```mermaid
-graph TD
-    A[Attio CRM] <-->|Webhooks/API| B[Attio Integration API]
-    C[Zoho] <-->|Webhooks/API| B
-    D[Braintree] <-->|Webhooks/API| B
-    B -->|Update| A
-    D -->|Payment Links| E[Customer Browser]
-    E -->|Complete Payment| D
-    A -->|Email with Link| E
+We're using a modular service-based architecture to organize the codebase:
+
+- **Services**: Encapsulate external API interactions (attioService.js, zohoService.js, braintreeService.js)
+- **Controllers**: Handle request/response logic and coordinate services
+- **Routes**: Define API endpoints and apply middleware
+- **Middleware**: Cross-cutting concerns like authentication, logging, and validation
+- **Utils**: Shared helper functions and utilities
+- **Config**: Application configuration management
+
+## 2. API Design Patterns
+
+### RESTful Endpoints
+
+- Use resource-based URLs following REST principles
+- Implement proper HTTP methods (GET, POST, PUT, DELETE)
+- Return appropriate status codes and consistent response formats
+- Endpoints grouped by resource domain (e.g., /api/sync, /api/webhooks)
+
+### Response Format
+
+All API responses follow a consistent format:
+
+```javascript
+// Success response
+{
+  "success": true,
+  "data": { /* response data */ }
+}
+
+// Error response
+{
+  "success": false,
+  "error": {
+    "message": "Error message",
+    "code": "ERROR_CODE", // Optional
+    "details": { /* Additional error details */ } // Optional
+  }
+}
 ```
 
-## Core Design Patterns
+## 3. Authentication & Security
 
-### 1. Service Layer Pattern
+### API Key Authentication
 
-The application is structured around service modules that encapsulate interactions with each external system:
+- Bearer token authentication for API access
+- Token stored as environment variable (`API_ACCESS_TOKEN`)
+- Authentication middleware applied to protected routes
 
-- `zohoService.js` - Handles all Zoho API operations
-- `attioService.js` - Manages Attio API operations
-- `braintreeService.js` - Manages Braintree payment operations and payment link generation
+### External API Authentication
 
-These services abstract the complexity of integrating with each platform, providing a clean interface for the rest of the application.
+#### Attio
 
-### 2. Webhook Observer Pattern
+- API Key based authentication
+- Keys stored as environment variables
 
-The system implements an observer pattern through webhooks:
+#### Zoho
 
-- External systems (Attio, Zoho, Braintree) act as subjects
-- Our API acts as the observer, receiving notifications of events
-- Event handlers process updates and propagate changes to other systems
+- OAuth 2.0 with refresh token
+- Automatic token refresh handling
+- Credentials stored as environment variables
 
-### 3. Bidirectional Data Flow Pattern
+#### Braintree
 
-The system implements a bidirectional flow where:
+- API keys for authentication
+- Sandbox/Production environment toggle
+- Credentials stored as environment variables
 
-- Customer data originates in Attio
-- Customer/subscription creation flows to Zoho via our API
-- Invoices originate in Zoho and trigger payments in Braintree via our API
-- Payment confirmations flow back to Zoho via our API
-- All customer IDs (Zoho, Braintree) are stored in Attio
+### Webhook Security
 
-### 4. Event-Driven Architecture
+- Signature verification for incoming webhooks
+- Unique secret keys for each integration
+- Request timestamp validation to prevent replay attacks
 
-The system operates on an event-driven model:
+## 4. Error Handling
 
-- Webhook events trigger specific workflows
-- Each event type has a dedicated handler
-- State changes propagate through the system based on events
+### Centralized Error Management
 
-### 5. Third-Party Payment Flow
+- Custom error classes with HTTP status codes
+- Global error handling middleware
+- Consistent error response format
+- Detailed logging for debugging
 
-- Braintree payment links handle the payment collection
-- No custom checkout UI to maintain
-- Secure payment processing through Braintree's hosted environment
-- Webhook-based notification when payment is complete
+### Retry Mechanism
 
-## Component Relationships
+- Exponential backoff for failed API calls
+- Configurable retry limits
+- Circuit breaker pattern for persistent failures
 
-### Route Layer
+## 5. Logging
 
-- Exposes webhook endpoints for each integrated system
-- Validates incoming requests
-- Routes events to appropriate service handlers
+### Structured Logging
 
-### Service Layer
+- Winston logger for structured logging
+- Log levels based on environment (development/production)
+- Request/response logging middleware
+- Performance metrics and timing information
 
-- Encapsulates business logic for each integration
-- Manages API authentication and communication
-- Transforms data between system formats
-- Handles automated customer and subscription creation
-- Generates payment links via Braintree API
+### Audit Trail
 
-### Utility Layer
+- Log important business operations for audit purposes
+- Track synchronization status and results
+- Record webhook receipt and processing
 
-- Provides shared functionality (logging, auth verification, etc.)
-- Ensures consistent error handling and security
+## 6. Configuration Management
 
-## Technical Decisions
+### Environment-Based Configuration
 
-### 1. No Database Approach
+- Environment variables with dotenv
+- Separate configuration for development and production
+- Validation of required configuration values
+- Sensitive data never logged or exposed
 
-Decision to use Attio objects as the primary data store instead of maintaining a separate database:
+## 7. Testing Approach
 
-- **Pros**: Simplified architecture, reduced infrastructure, single source of truth
-- **Cons**: Dependency on Attio API availability, potential performance constraints
-- **Mitigation**: Implement request retries and circuit breakers for API resilience
+### Service Testing
 
-### 2. Webhook-First Integration
+- Unit tests for service modules
+- Mocked external API responses
+- Testing utilities for common scenarios
 
-Using webhooks as the primary integration mechanism for real-time updates:
+### Integration Testing
 
-- **Pros**: Near real-time data updates, reduced polling overhead
-- **Cons**: Requires handling webhook delivery failures, verification complexity
-- **Mitigation**: Implement webhook signature verification and delivery confirmation
+- API endpoint testing with supertest
+- End-to-end flow validation
+- Webhook payload verification
 
-### 3. Serverless Deployment
+## 8. Code Style & Organization
 
-Using Render.com for serverless deployment:
+### Functional Programming
 
-- **Pros**: Simplified infrastructure, auto-scaling, reduced maintenance
-- **Cons**: Cold start latency, execution time limits
-- **Mitigation**: Optimize code for quick startup, implement background processes for long-running tasks
+- Pure functions over classes where possible
+- Immutable data structures
+- Function composition for complex operations
+- Clear separation of concerns
 
-### 4. Braintree Payment Links
+### File Structure
 
-Using Braintree payment links instead of a custom checkout UI:
-
-- **Pros**: No UI development or maintenance needed, PCI compliance handled by Braintree, seamless user experience
-- **Cons**: Less customization of the payment experience, dependency on Braintree's link functionality
-- **Mitigation**: Clear communication about payment process in email templates, fallback methods if needed
-
-## Automation Workflows
-
-### 1. Customer Subscription Initiation
-
-```mermaid
-sequenceDiagram
-    participant Customer
-    participant Attio
-    participant API
-    participant Braintree
-    participant Zoho
-
-    Customer->>Attio: Select subscription
-    Attio->>API: Trigger subscription process
-    API->>Braintree: Generate payment link
-    Braintree-->>API: Payment link URL
-    API->>Attio: Return payment link
-    Attio->>Customer: Email payment link
-    Customer->>Braintree: Complete payment on Braintree page
-    Braintree->>API: Payment webhook
-    API->>Braintree: Create customer record
-    Braintree-->>API: Braintree Customer ID
-    API->>Zoho: Create customer + subscription
-    Zoho-->>API: Zoho Customer ID
-    API->>Attio: Update Customer IDs
+```
+src/
+├── config/           # Configuration management
+├── controllers/      # Request handlers
+│   ├── api/          # API controllers
+│   └── views/        # Frontend view controllers
+├── middleware/       # Express middleware
+├── routes/           # Route definitions
+│   ├── api/          # API routes
+│   └── views/        # Frontend view routes
+├── services/         # External API integrations
+├── utils/            # Helper functions
+│   └── markdown.js   # Markdown processing utility
+├── views/            # EJS templates
+│   ├── layouts/      # Layout templates
+│   ├── partials/     # Reusable template parts
+│   ├── proposals/    # Proposal view templates
+│   └── quotes/       # Quote view templates
+├── public/           # Static assets
+│   ├── css/          # Stylesheets
+│   ├── js/           # Client-side JavaScript
+│   └── images/       # Image assets
+└── index.js          # Application entry point
 ```
 
-### 2. Invoice Payment Processing
+### Naming Conventions
 
-```mermaid
-sequenceDiagram
-    participant Zoho
-    participant API
-    participant Attio
-    participant Braintree
+- camelCase for variables, functions, and files
+- PascalCase for classes and types
+- UPPER_SNAKE_CASE for constants
+- Descriptive, intention-revealing names
 
-    Zoho->>API: Invoice webhook
-    API->>Attio: Find client by Zoho ID
-    Attio-->>API: Client + Braintree ID
-    API->>Braintree: Process payment
-    Braintree-->>API: Payment result
-    API->>Zoho: Confirm payment
-    API->>Attio: Update payment status
+## 9. API Integration Patterns
+
+### Adapter Pattern
+
+- Service modules adapt external APIs to internal interfaces
+- Abstract away platform-specific details
+- Standardized error handling and response formatting
+
+### Facade Pattern
+
+- Simplified interfaces for complex subsystems
+- Controllers use facades to coordinate multiple services
+- Clean separation between API routes and business logic
+
+### Repository Pattern
+
+- Services provide data access abstraction
+- Consistent CRUD operations regardless of data source
+- Data mapping between different API formats
+
+## 10. Webhook Processing
+
+### Event-Driven Architecture
+
+- Webhook endpoints for real-time updates
+- Event validation and processing pipeline
+- Queuing for high-volume webhook handling
+
+### Idempotent Processing
+
+- Safe to process the same webhook multiple times
+- Check for duplicate events
+- Transactional processing where possible
+
+## 11. Synchronization Strategy
+
+### Scheduled Synchronization
+
+- Periodic synchronization for data consistency
+- Incremental updates when possible
+- Record last sync time for efficient processing
+
+### Change Detection
+
+- Compare existing data before updating
+- Skip unchanged records
+- Log synchronization results for audit
+
+## Frontend Implementation with EJS
+
+### Architecture Overview
+
+We're implementing a client-facing frontend using EJS templates integrated with our existing Express.js API. This approach allows us to:
+
+1. Leverage our existing Express.js application
+2. Render dynamic HTML pages for client proposals and quotes
+3. Display data from Attio directly in the templates
+4. Process markdown content into formatted HTML
+5. Maintain a clean separation between API and client-facing routes
+
+### Folder Structure
+
+We'll extend our existing structure to include frontend components:
+
+```
+src/
+├── config/           # Configuration management
+├── controllers/      # Request handlers
+│   ├── api/          # API controllers
+│   └── views/        # Frontend view controllers
+├── middleware/       # Express middleware
+├── routes/           # Route definitions
+│   ├── api/          # API routes
+│   └── views/        # Frontend view routes
+├── services/         # External API integrations
+├── utils/            # Helper functions
+│   └── markdown.js   # Markdown processing utility
+├── views/            # EJS templates
+│   ├── layouts/      # Layout templates
+│   ├── partials/     # Reusable template parts
+│   ├── proposals/    # Proposal view templates
+│   └── quotes/       # Quote view templates
+├── public/           # Static assets
+│   ├── css/          # Stylesheets
+│   ├── js/           # Client-side JavaScript
+│   └── images/       # Image assets
+└── index.js          # Application entry point
 ```
 
-## Error Handling Strategy
+### EJS Template Organization
 
-- All API calls implement retry logic with exponential backoff
-- Webhook processing failures are logged and can be manually retried
-- Critical errors trigger alerts to the development team
-- Failed payments have a specific recovery workflow
-- System maintains transaction logs for reconciliation
+We'll use a template inheritance pattern:
 
-This architecture provides a flexible foundation that can adapt to changes in any of the integrated systems while maintaining reliable data flow and synchronization, with a focus on full automation of the subscription and payment lifecycle.
+1. **Layouts**: Base templates that define the page structure
+2. **Partials**: Reusable components like headers, footers, and navigation
+3. **View-specific templates**: Content for specific pages (proposals, quotes)
+
+### Routes & Controllers
+
+```javascript
+// routes/views/index.js
+const express = require("express");
+const router = express.Router();
+const proposalController = require("../../controllers/views/proposalController");
+const quoteController = require("../../controllers/views/quoteController");
+
+// Proposal routes
+router.get("/proposals/:id", proposalController.getProposal);
+
+// Quote routes
+router.get("/quotes/:id", quoteController.getQuote);
+
+module.exports = router;
+```
+
+```javascript
+// controllers/views/proposalController.js
+const attioService = require("../../services/attioService");
+const markdownUtils = require("../../utils/markdown");
+
+async function getProposal(req, res) {
+  try {
+    const { id } = req.params;
+
+    // Fetch proposal data from Attio
+    const proposalData = await attioService.getProposal(id);
+
+    // Convert markdown to HTML
+    if (proposalData.serviceAgreement) {
+      proposalData.serviceAgreementHtml = await markdownUtils.convertToHtml(
+        proposalData.serviceAgreement
+      );
+    }
+
+    // Render the proposal view with data
+    res.render("proposals/show", {
+      title: `Proposal - ${proposalData.title || id}`,
+      proposal: proposalData,
+    });
+  } catch (error) {
+    // Handle errors
+    res.status(404).render("errors/not-found", {
+      message: "Proposal not found",
+    });
+  }
+}
+
+module.exports = {
+  getProposal,
+};
+```
+
+### Secure URL Generation
+
+We'll implement a secure URL generation system:
+
+```javascript
+// utils/urlGenerator.js
+const crypto = require("crypto");
+
+function generateSecureToken(length = 32) {
+  return crypto.randomBytes(length).toString("hex");
+}
+
+function generateProposalUrl(proposalId, expiryDate) {
+  const token = generateSecureToken();
+
+  // Store token with expiry in database or Attio
+  // This is a simplified example
+
+  return `/proposals/${proposalId}?token=${token}`;
+}
+
+module.exports = {
+  generateSecureToken,
+  generateProposalUrl,
+};
+```
+
+### Authentication Middleware
+
+To secure client-facing views:
+
+```javascript
+// middleware/tokenAuth.js
+const attioService = require("../services/attioService");
+
+async function validateViewToken(req, res, next) {
+  const { token } = req.query;
+  const { id } = req.params;
+
+  if (!token) {
+    return res.status(401).render("errors/unauthorized", {
+      message: "Access token is required",
+    });
+  }
+
+  try {
+    // Validate token against stored value
+    // This is a simplified example
+    const isValid = await attioService.validateViewToken(id, token);
+
+    if (!isValid) {
+      return res.status(401).render("errors/unauthorized", {
+        message: "Invalid or expired access token",
+      });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).render("errors/error", {
+      message: "Error validating access",
+    });
+  }
+}
+
+module.exports = {
+  validateViewToken,
+};
+```
+
+### Markdown Processing
+
+For converting markdown content to HTML:
+
+```javascript
+// utils/markdown.js
+const marked = require("marked");
+const sanitizeHtml = require("sanitize-html");
+
+// Configure marked options
+marked.setOptions({
+  gfm: true, // GitHub flavored markdown
+  breaks: true, // Convert line breaks to <br>
+  headerIds: true, // Add IDs to headers
+  mangle: false, // Don't escape HTML
+});
+
+async function convertToHtml(markdown) {
+  if (!markdown) return "";
+
+  // Convert markdown to HTML
+  const html = marked.parse(markdown);
+
+  // Sanitize HTML to prevent XSS
+  const sanitizedHtml = sanitizeHtml(html, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "img",
+      "span",
+    ]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      "*": ["class", "id", "style"],
+    },
+  });
+
+  return sanitizedHtml;
+}
+
+module.exports = {
+  convertToHtml,
+};
+```
+
+### Express Configuration
+
+To set up EJS in the existing Express app:
+
+```javascript
+// index.js
+const express = require("express");
+const path = require("path");
+const apiRoutes = require("./routes/api");
+const viewRoutes = require("./routes/views");
+
+const app = express();
+
+// View engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
+// Static files
+app.use(express.static(path.join(__dirname, "public")));
+
+// API routes
+app.use("/api", apiRoutes);
+
+// View routes
+app.use("/", viewRoutes);
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+### Data Flow
+
+The data flow for the frontend views will be:
+
+1. Client requests a proposal/quote URL with a secure token
+2. Authentication middleware validates the token
+3. Controller fetches data from Attio using the existing service
+4. Markdown content is processed into HTML
+5. Data is passed to the EJS template for rendering
+6. Rendered HTML is sent to the client
+
+### CSS Framework Recommendation
+
+For the frontend styling, we'll use Tailwind CSS:
+
+- Utility-first approach allows rapid development
+- Small production bundle size with PurgeCSS
+- Responsive design built-in
+- Customizable to match brand requirements
+- No need for large CSS frameworks
+
+### Print & Export Functionality
+
+For print and PDF export capabilities:
+
+1. Optimize CSS for print media queries
+2. Provide a "Print" button that triggers browser print
+3. For PDF export, use client-side libraries or server-side rendering with tools like Puppeteer
+
+### Progressive Enhancement
+
+Our frontend implementation will follow progressive enhancement principles:
+
+1. Core content and functionality works without JavaScript
+2. JavaScript enhances the experience where appropriate
+3. Responsive design works on all device sizes
+4. Accessibility built in from the start
