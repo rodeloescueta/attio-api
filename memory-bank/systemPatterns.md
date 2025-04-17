@@ -513,3 +513,52 @@ Our frontend implementation will follow progressive enhancement principles:
 2. JavaScript enhances the experience where appropriate
 3. Responsive design works on all device sizes
 4. Accessibility built in from the start
+
+## Proposal System
+
+### Data Flow
+
+```mermaid
+graph TD
+    A[Attio Lead Data] --> B[Proposal Page]
+    B --> C[Client Views]
+    C --> D[E-Signature]
+    D --> E[Update Attio Record]
+```
+
+### Component Structure
+
+1. **Route Layer** (`/proposals/:record_id`)
+
+   - Handles request/response
+   - Fetches data from Attio
+   - Renders templates
+
+2. **Service Layer** (`AttioAPI`)
+
+   - Manages Attio API communication
+   - Handles data transformation
+   - Manages record updates
+
+3. **View Layer** (EJS Templates)
+   - Layout template with navigation
+   - Section-based content display
+   - Interactive elements
+   - E-signature integration
+
+### Security Patterns
+
+- Secure access to proposal pages
+- Signature verification
+- Audit trail for interactions
+- Secure storage of signed documents
+
+### Template Structure
+
+```
+views/
+├── layouts/
+│   └── main.ejs
+└── proposals/
+    └── show.ejs
+```

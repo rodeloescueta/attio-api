@@ -3,16 +3,33 @@ const express = require("express");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
 const logger = require("./utils/logger");
+const path = require("path");
 const { setupRoutes } = require("./routes");
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// View engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
 // Apply middleware
-app.use(helmet()); // Security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
+        scriptSrc: ["'self'", "https://cdn.tailwindcss.com"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+  })
+); // Security headers with CSP configured for TailwindCSS
 app.use(bodyParser.json()); // Parse JSON request body
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.static(path.join(__dirname, "public"))); // Serve static files
 
 // Request logging middleware
 app.use((req, res, next) => {

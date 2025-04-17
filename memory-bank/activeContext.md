@@ -2,39 +2,69 @@
 
 ## Current Focus
 
-We have successfully implemented the core Attio-Zoho integration for service synchronization, and completed a full sync of all production plans from Zoho to Attio. The system can now retrieve service plans from Zoho Subscriptions, create a corresponding collection in Attio, and populate it with service data. We're now focusing on automating this synchronization process, improving error handling, and preparing for the next phase of the subscription workflow implementation.
-
-We are also adding a frontend component using EJS templates to create client-facing views for proposals and quotes. This will allow clients to view service proposals with pricing information pulled from Attio. The frontend will also include a markdown-to-HTML conversion utility for rendering service agreements and other formatted content.
+Working on the proposal system that integrates with Attio's lead data to create interactive, signable proposals.
 
 ## Recent Changes
 
-- Created project plan (PLAN.md)
-- Established Memory Bank documentation structure
-- Defined core project requirements and integration patterns
-- Researched API capabilities for all three platforms
-- Updated project documentation to use pnpm instead of npm
-- Cleaned up .cursor/rules file to remove irrelevant content
-- Refined the workflow based on feedback about Zoho Flow limitations
-- Shifted from custom checkout UI to Braintree payment links approach
-- Set up basic Express.js server with routes and logging
-- Implemented functional approach for Attio service layer
-- Created configuration management system
-- Added webhook validation middleware skeleton
-- Removed unnecessary helper.env file
-- Implemented authentication middleware with API key validation
-- Added permission-based access control for routes
-- Created utility scripts for token generation and testing
-- Updated environment configuration with API access token
-- Adjusted project priorities to focus on Attio-Zoho service synchronization first
-- Implemented Zoho service with OAuth refresh token management
-- Enhanced Attio service with collection operations support
-- Created sync service for Zoho-Attio integration
-- Implemented endpoints for triggering and monitoring synchronization
-- Added testing utilities for the synchronization process
-- Fixed data type issues in the billing_frequency field for Attio integration
-- Successfully completed a full synchronization of all Zoho production plans to Attio
-- Created comprehensive documentation for the Zoho-Attio synchronization process
-- Updated project plan to include client-facing frontend using EJS templates
+1. Implemented basic proposal viewing system
+2. Set up EJS templating
+3. Configured static file serving
+4. Added debug view for Attio lead data
+
+## Active Development
+
+- Converting the raw Attio lead data into a professional proposal layout
+- Planning e-signature integration
+- Designing the proposal template system
+
+## Technical Context
+
+- Using Express.js with EJS templates
+- Attio API integration for lead data
+- Tailwind CSS for styling
+- Currently displaying raw JSON for debugging
+
+## Next Steps
+
+1. Create professional proposal template layout
+
+   - Convert existing EJS debug view to full proposal template
+   - Implement navigation sidebar
+   - Add section-based content display
+
+2. Implement e-signature functionality
+
+   - Research and select e-signature library
+   - Design signature capture interface
+   - Create Attio update mechanism for signed proposals
+
+3. Add PDF generation
+   - Add download functionality
+   - Implement print-friendly styling
+   - Create PDF version of signed proposals
+
+## Current Decisions
+
+1. Using Attio's "leads" object type as data source
+2. EJS for template rendering
+3. Tailwind CSS for styling
+4. Planning to implement client-side navigation
+
+## Open Questions
+
+1. Which e-signature library to use?
+2. How to structure the Attio data updates for signed proposals?
+3. What PDF generation approach to take?
+4. Security measures for proposal access?
+
+## Dependencies
+
+- Express.js
+- EJS
+- Tailwind CSS
+- Attio API
+- (Pending) E-signature library
+- (Pending) PDF generation library
 
 ## Active Decisions
 
@@ -170,50 +200,6 @@ Next is the implementation of the subscription flow:
    - Show pricing details in a clean, professional format
    - Present service agreements with proper formatting
    - Provide a way for clients to accept proposals (potentially)
-
-## Next Steps
-
-### Immediate (Next 1-2 Days)
-
-1. ~~Set up basic Express API project structure with pnpm~~ ✅
-2. ~~Create service files for each integration (attioService.js)~~ ✅
-3. ~~Set up authentication middleware for protected routes~~ ✅
-4. ~~Create zohoService.js for fetching service plans~~ ✅
-5. ~~Enhance attioService.js to support collection operations~~ ✅
-6. ~~Implement service synchronization logic~~ ✅
-7. ~~Create sync API endpoint to trigger synchronization~~ ✅
-8. ~~Test the synchronization with real credentials~~ ✅
-9. ~~Fix data type compatibility issues between Zoho and Attio~~ ✅
-10. ~~Complete full synchronization of all Zoho plans to Attio~~ ✅
-11. Implement detailed error handling and logging
-12. Set up automatic periodic synchronization using a cron job
-13. Install and configure EJS template engine
-14. Create basic layout templates for proposals and quotes
-15. Implement markdown-to-HTML conversion utility
-
-### Short-term (This Week)
-
-1. Create a cron job or scheduled task for automatic synchronization
-2. Start implementing the Braintree service for payment links
-3. Begin development of the subscription creation flow
-4. Create client object schema in Attio with necessary IDs
-5. Create routes for proposal and quote views
-6. Implement secure URL generation for client access
-7. Design and implement proposal view template
-8. Fetch and display service data from Attio in templates
-
-### Medium-term (Next 2 Weeks)
-
-1. Implement complete webhook handling for all platforms
-2. Build subscription trigger flow from Attio to Braintree and Zoho
-3. Implement automated payment processing via webhooks
-4. Create comprehensive testing scenarios
-5. Deploy test version to Render.com
-6. Add quote view template with dynamic pricing
-7. Implement service agreement display with markdown parsing
-8. Create URL tracking and expiration system
-9. Add proposal acceptance functionality (if required)
-10. Implement print and PDF export options
 
 ## Current Questions
 
