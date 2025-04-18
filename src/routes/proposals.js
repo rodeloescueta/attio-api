@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { AttioAPI } = require("../services/attio");
 
-// Show lead page
+// Show deal page
 router.get("/:record_id", async (req, res) => {
   try {
     const attio = new AttioAPI();
@@ -12,28 +12,28 @@ router.get("/:record_id", async (req, res) => {
       return res.status(400).send("Record ID is required");
     }
 
-    // Fetch lead data from Attio
-    const leadData = await attio.getRecord("leads", recordId);
+    // Fetch deal data from Attio
+    const dealData = await attio.getRecord("deals", recordId);
 
-    if (!leadData) {
-      return res.status(404).send("Lead not found");
+    if (!dealData) {
+      return res.status(404).send("Deal not found");
     }
 
-    console.log("Lead Data:", JSON.stringify(leadData, null, 2));
+    console.log("Deal Data:", JSON.stringify(dealData, null, 2));
 
     // Render the data directly in a simple page
     res.send(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Lead Data</title>
+          <title>Deal Data</title>
           <script src="https://cdn.tailwindcss.com"></script>
         </head>
         <body class="bg-gray-50 p-8">
           <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Lead Data</h1>
+            <h1 class="text-2xl font-bold mb-4">Deal Data</h1>
             <pre class="bg-white p-6 rounded-lg shadow overflow-auto">${JSON.stringify(
-              leadData,
+              dealData,
               null,
               2
             )}</pre>
@@ -42,9 +42,9 @@ router.get("/:record_id", async (req, res) => {
       </html>
     `);
   } catch (error) {
-    console.error("Error fetching lead:", error);
+    console.error("Error fetching deal:", error);
     const errorMessage =
-      error.response?.data?.message || "Error loading lead data";
+      error.response?.data?.message || "Error loading deal data";
     res.status(error.response?.status || 500).send(errorMessage);
   }
 });
