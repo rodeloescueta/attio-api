@@ -2,35 +2,38 @@
 
 ## Current Focus
 
-Working on the proposal system that integrates with Attio's lead data to create interactive, signable proposals.
+Working on deploying the proposal system to AWS Lightsail and implementing additional features.
 
 ## Recent Changes
 
-1. Implemented basic proposal viewing system
-2. Set up EJS templating
-3. Configured static file serving
-4. Added debug view for Attio lead data
+1. Implemented professional proposal template
+2. Added markdown rendering for service agreements
+3. Configured security headers and CSP
+4. Fixed template rendering issues
+5. Added proper error handling
 
 ## Active Development
 
-- Converting the raw Attio lead data into a professional proposal layout
-- Planning e-signature integration
-- Designing the proposal template system
+- Planning AWS Lightsail deployment
+- Preparing e-signature integration
+- Designing PDF generation system
 
 ## Technical Context
 
 - Using Express.js with EJS templates
 - Attio API integration for lead data
 - Tailwind CSS for styling
-- Currently displaying raw JSON for debugging
+- Marked.js for markdown rendering
+- Helmet for security headers
 
 ## Next Steps
 
-1. Create professional proposal template layout
+1. Deploy to AWS Lightsail
 
-   - Convert existing EJS debug view to full proposal template
-   - Implement navigation sidebar
-   - Add section-based content display
+   - Set up Node.js environment
+   - Configure SSL/TLS
+   - Set up environment variables
+   - Configure domain and DNS
 
 2. Implement e-signature functionality
 
@@ -45,23 +48,26 @@ Working on the proposal system that integrates with Attio's lead data to create 
 
 ## Current Decisions
 
-1. Using Attio's "leads" object type as data source
-2. EJS for template rendering
-3. Tailwind CSS for styling
-4. Planning to implement client-side navigation
+1. Using AWS Lightsail for deployment
+2. Node.js 22.14.0 for runtime
+3. Using Marked.js for markdown rendering
+4. Helmet for security headers
+5. Planning to use Let's Encrypt for SSL
 
 ## Open Questions
 
 1. Which e-signature library to use?
-2. How to structure the Attio data updates for signed proposals?
+2. How to handle SSL certificate management in Lightsail?
 3. What PDF generation approach to take?
-4. Security measures for proposal access?
+4. How to manage environment variables in production?
 
 ## Dependencies
 
 - Express.js
 - EJS
 - Tailwind CSS
+- Marked.js
+- Helmet
 - Attio API
 - (Pending) E-signature library
 - (Pending) PDF generation library

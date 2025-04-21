@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // View engine setup
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "..", "views"));
 app.set("view engine", "ejs");
 
 // Apply middleware
@@ -21,12 +21,18 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
-        scriptSrc: ["'self'", "https://cdn.tailwindcss.com"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.tailwindcss.com",
+          "https://cdn.jsdelivr.net",
+        ],
         imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https://cdn.tailwindcss.com"],
       },
     },
   })
-); // Security headers with CSP configured for TailwindCSS
+); // Security headers with CSP configured for TailwindCSS and other resources
 app.use(bodyParser.json()); // Parse JSON request body
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(express.static(path.join(__dirname, "public"))); // Serve static files

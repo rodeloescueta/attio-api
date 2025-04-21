@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { AttioAPI } = require("../services/attio");
+const marked = require("marked");
 
 // Show deal page
 router.get("/:record_id", async (req, res) => {
@@ -15,32 +16,19 @@ router.get("/:record_id", async (req, res) => {
     // Fetch deal data from Attio
     const dealData = await attio.getRecord("deals", recordId);
 
-    if (!dealData) {
-      return res.status(404).send("Deal not found");
+    if (!dealData || !dealData.data || !dealData.data.values) {
+      console.error("Invalid deal data structure:", dealData);
+      return res.status(404).send("Deal data not found or invalid");
     }
 
-    console.log("Deal Data:", JSON.stringify(dealData, null, 2));
+    // Log the data structure for debugging
+    console.log("Deal Data Structure:", JSON.stringify(dealData, null, 2));
 
-    // Render the data directly in a simple page
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Deal Data</title>
-          <script src="https://cdn.tailwindcss.com"></script>
-        </head>
-        <body class="bg-gray-50 p-8">
-          <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Deal Data</h1>
-            <pre class="bg-white p-6 rounded-lg shadow overflow-auto">${JSON.stringify(
-              dealData,
-              null,
-              2
-            )}</pre>
-          </div>
-        </body>
-      </html>
-    `);
+    // Render the proposal template with the data
+    res.render("proposal", {
+      data: dealData.data,
+      marked: marked,
+    });
   } catch (error) {
     console.error("Error fetching deal:", error);
     const errorMessage =
