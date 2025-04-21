@@ -11,12 +11,14 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
 3. Configured security headers and CSP
 4. Fixed template rendering issues
 5. Added proper error handling
+6. Created AWS Lightsail deployment guide
 
 ## Active Development
 
 - Planning AWS Lightsail deployment
 - Preparing e-signature integration
 - Designing PDF generation system
+- Setting up production environment in Lightsail
 
 ## Technical Context
 
@@ -25,15 +27,17 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
 - Tailwind CSS for styling
 - Marked.js for markdown rendering
 - Helmet for security headers
+- AWS Lightsail for hosting
 
 ## Next Steps
 
 1. Deploy to AWS Lightsail
 
    - Set up Node.js environment
-   - Configure SSL/TLS
+   - Configure SSL/TLS with Let's Encrypt
    - Set up environment variables
    - Configure domain and DNS
+   - Set up monitoring and alerts
 
 2. Implement e-signature functionality
 
@@ -53,13 +57,16 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
 3. Using Marked.js for markdown rendering
 4. Helmet for security headers
 5. Planning to use Let's Encrypt for SSL
+6. Using systemd for process management
+7. Implementing load balancer for SSL termination
 
 ## Open Questions
 
 1. Which e-signature library to use?
-2. How to handle SSL certificate management in Lightsail?
+2. What backup strategy to implement in Lightsail?
 3. What PDF generation approach to take?
-4. How to manage environment variables in production?
+4. How to handle automatic scaling if needed?
+5. What monitoring metrics are most important?
 
 ## Dependencies
 
@@ -69,6 +76,7 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
 - Marked.js
 - Helmet
 - Attio API
+- AWS Lightsail infrastructure
 - (Pending) E-signature library
 - (Pending) PDF generation library
 
@@ -82,9 +90,9 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
 
 2. **Deployment Platform**:
 
-   - Decision: Use Render.com for serverless deployment
+   - Decision: Use AWS Lightsail for deployment
    - Status: Confirmed
-   - Rationale: Easy setup, GitHub integration, environment variable management, and webhook compatibility
+   - Rationale: Cost-effective, easy to manage, good performance, and includes SSL/TLS support
 
 3. **Integration Approach**:
 
@@ -96,13 +104,13 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
 
    - Decision: Environment variable storage of API credentials
    - Status: Confirmed
-   - Rationale: Secure, follows best practices, and supported by Render.com
+   - Rationale: Secure, follows best practices, and supported by AWS Lightsail
 
 5. **Package Management**:
 
-   - Decision: Use pnpm instead of npm
+   - Decision: Use npm for package management
    - Status: Confirmed
-   - Rationale: Faster installation, better dependency management, and disk space efficiency
+   - Rationale: Standard package manager, well-supported in Lightsail environment
 
 6. **Payment Flow**:
 
@@ -110,52 +118,28 @@ Working on deploying the proposal system to AWS Lightsail and implementing addit
    - Status: Confirmed
    - Rationale: Simplifies development, eliminates UI maintenance, leverages Braintree's secure checkout
 
-7. **Automated Workflow**:
+7. **Infrastructure Management**:
 
-   - Decision: Replace manual processes with API-driven workflow
+   - Decision: Use AWS Lightsail built-in tools for monitoring and management
    - Status: Confirmed
-   - Rationale: Remove human intervention in the subscription/payment flow
+   - Rationale: Integrated monitoring, automatic backups, and simplified management
 
-8. **Code Structure**:
+8. **SSL/TLS Management**:
 
-   - Decision: Use functional programming approach instead of classes
+   - Decision: Use Lightsail Load Balancer with Let's Encrypt
    - Status: Confirmed
-   - Rationale: Better composability, easier testing, and follows modern JavaScript patterns
+   - Rationale: Automatic certificate management and renewal
 
-9. **API Authentication**:
+9. **Process Management**:
 
-   - Decision: Use API key authentication with Bearer token
+   - Decision: Use systemd for service management
    - Status: Confirmed
-   - Rationale: Simple to implement, secure, and allows for future extension to more sophisticated auth methods
+   - Rationale: Reliable process management with automatic restarts and logging
 
-10. **Permission Model**:
-
-    - Decision: Implement a permission-based middleware framework
+10. **Monitoring Strategy**:
+    - Decision: Use Lightsail native monitoring with custom alerts
     - Status: Confirmed
-    - Rationale: Provides granular control over route access and can be extended to support different user roles in the future
-
-11. **Integration Priority**:
-
-    - Decision: Implement Attio-Zoho service synchronization first
-    - Status: Completed
-    - Rationale: Validates connectivity with both systems early and establishes foundation for subscription flow
-
-12. **Zoho Authentication**:
-
-    - Decision: Use OAuth with refresh token management
-    - Status: Confirmed
-    - Rationale: Follows Zoho's recommended approach and handles token expiration automatically
-
-13. **Data Synchronization Format**:
-
-    - Decision: Convert Zoho numeric values to strings for Attio compatibility when needed
-    - Status: Implemented
-    - Rationale: Ensures data type consistency between the two systems
-
-14. **Frontend Technology**:
-    - Decision: Use EJS templates with Express.js for client-facing views
-    - Status: Confirmed
-    - Rationale: Simplifies integration with existing Express app, lightweight, and sufficient for our needs
+    - Rationale: Built-in metrics, easy to set up, covers essential monitoring needs
 
 ## Current Challenges
 
